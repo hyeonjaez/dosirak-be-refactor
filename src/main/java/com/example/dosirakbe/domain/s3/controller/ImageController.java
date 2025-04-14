@@ -1,7 +1,5 @@
 package com.example.dosirakbe.domain.s3.controller;
 
-
-
 import com.example.dosirakbe.global.config.S3Uploader;
 import com.example.dosirakbe.global.util.CustomException;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +17,6 @@ public class ImageController {
 
     private final S3Uploader s3Uploader;
 
-    // 여러 이미지 업로드
     @PostMapping("/upload-multiple")
     public ResponseEntity<List<String>> uploadMultipleImages(@RequestParam("files") List<MultipartFile> files) {
         try {
@@ -30,7 +27,6 @@ public class ImageController {
         }
     }
 
-    // 단일 이미지 업로드
     @PostMapping("/upload")
     public ResponseEntity<String> uploadSingleImage(@RequestParam("file") MultipartFile file) {
         try {
@@ -41,7 +37,6 @@ public class ImageController {
         }
     }
 
-    // 이미지 삭제
     @DeleteMapping("/delete")
     public ResponseEntity<String> deleteImage(@RequestParam("url") String fileUrl) {
         try {

@@ -1,13 +1,10 @@
 package com.example.dosirakbe.domain.store.controller;
 
-
-import com.example.dosirakbe.domain.store.dto.request.StoreRequest;
 import com.example.dosirakbe.domain.store.dto.response.StoreDetailResponse;
 import com.example.dosirakbe.domain.store.dto.response.StoreResponse;
 import com.example.dosirakbe.domain.store.service.StoreService;
-import com.example.dosirakbe.global.util.ApiResult;
-import com.example.dosirakbe.global.util.StatusEnum;
-import jakarta.validation.Valid;
+import com.github.hyeonjaez.springcommon.response.ApiResponse;
+import com.github.hyeonjaez.springcommon.response.ApiResponseUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,7 +24,6 @@ import java.util.List;
  */
 
 
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/guide/stores")
@@ -43,20 +39,15 @@ public class StoreController {
      * </p>
      *
      * @param storeId 조회할 가게의 고유 ID
-     * @return 가게의 상세 정보를 포함한 {@link ApiResult} 형태의 {@link StoreDetailResponse}
+     * @return 가게의 상세 정보를 포함한 {@link ApiResponse} 형태의 {@link StoreDetailResponse}
      */
 
 
     @GetMapping("/{storeId}")
-    public ResponseEntity<ApiResult<StoreDetailResponse>> getStoreDetail(@PathVariable("storeId") Long storeId){
+    public ResponseEntity<ApiResponse<StoreDetailResponse>> getStoreDetail(@PathVariable("storeId") Long storeId) {
         StoreDetailResponse storeDetailResponse = storeService.getStoreDetail(storeId);
-        return ResponseEntity.ok(
-                ApiResult.<StoreDetailResponse>builder()
-                        .status(StatusEnum.SUCCESS)
-                        .message("스토어 상세 페이지 반환")
-                        .data(storeDetailResponse)
-                        .build()
-        );
+
+        return ApiResponseUtil.ok("스토어 상세 페이지 반환", storeDetailResponse);
     }
 
     /**
@@ -67,19 +58,15 @@ public class StoreController {
      * </p>
      *
      * @param keyword 검색할 키워드
-     * @return 검색 결과를 포함한 {@link ApiResult} 형태의 {@link List} 객체
+     * @return 검색 결과를 포함한 {@link ApiResponse} 형태의 {@link List} 객체
      */
 
     @GetMapping(params = "keyword")
-    public ResponseEntity<ApiResult<List<StoreResponse>>> searchStores(@RequestParam("keyword") String keyword) {
+    public ResponseEntity<ApiResponse<List<StoreResponse>>> searchStores(@RequestParam("keyword") String keyword) {
         List<StoreResponse> stores = storeService.searchStores(keyword);
-        return ResponseEntity.ok(
-                ApiResult.<List<StoreResponse>>builder()
-                        .status(StatusEnum.SUCCESS)
-                        .message("스토어 검색 결과 반환")
-                        .data(stores)
-                        .build()
-        );
+
+        return ApiResponseUtil.ok("스토어 검색 결과 반환", stores);
+
     }
 
     /**
@@ -90,19 +77,15 @@ public class StoreController {
      * </p>
      *
      * @param category 검색할 카테고리
-     * @return 카테고리에 해당하는 가게 목록을 포함한 {@link ApiResult} 형태의 {@link List} 객체
+     * @return 카테고리에 해당하는 가게 목록을 포함한 {@link ApiResponse} 형태의 {@link List} 객체
      */
 
     @GetMapping(params = "category")
-    public ResponseEntity<ApiResult<List<StoreResponse>>> getStoresByCategory(@RequestParam("category") String category) {
+    public ResponseEntity<ApiResponse<List<StoreResponse>>> getStoresByCategory(@RequestParam("category") String category) {
         List<StoreResponse> stores = storeService.storesByCategory(category);
-        return ResponseEntity.ok(
-                ApiResult.<List<StoreResponse>>builder()
-                        .status(StatusEnum.SUCCESS)
-                        .message("카테고리별 스토어 반환")
-                        .data(stores)
-                        .build()
-        );
+
+        return ApiResponseUtil.ok("카테고리별 스토어 반환", stores);
+
     }
 
     /**
@@ -113,22 +96,16 @@ public class StoreController {
      * </p>
      *
      * @param currentMapX, currentMapY 현재 사용자의 위도 경도 값
-     * @return 사용자의 현재 위치 기반 반경 내 스토어 목록을 포함한 {@link ApiResult} 형태의 {@link List} 객체
+     * @return 사용자의 현재 위치 기반 반경 내 스토어 목록을 포함한 {@link ApiResponse} 형태의 {@link List} 객체
      */
 
     @GetMapping("/nearby")
-    public ResponseEntity<ApiResult<List<StoreResponse>>> getNearbyStores(
-            @RequestParam(name = "currentMapX") double currentMapX,
-            @RequestParam(name = "currentMapY") double currentMapY) {
+    public ResponseEntity<ApiResponse<List<StoreResponse>>> getNearbyStores(@RequestParam(name = "currentMapX") double currentMapX,
+                                                                            @RequestParam(name = "currentMapY") double currentMapY) {
 
         List<StoreResponse> stores = storeService.getStoresWithinRadius(currentMapX, currentMapY);
-        return ResponseEntity.ok(
-                ApiResult.<List<StoreResponse>>builder()
-                        .status(StatusEnum.SUCCESS)
-                        .message("근처 스토어 반환")
-                        .data(stores)
-                        .build()
-        );
+
+        return ApiResponseUtil.ok("근처 스토어 반환", stores);
     }
 
 
@@ -139,22 +116,14 @@ public class StoreController {
      * 이 메서드는 데이터베이스에 저장된 모든 가게의 목록을 반환합니다.
      * </p>
      *
-     * @return 전체 스토어 목록을 포함한 {@link ApiResult} 형태의 {@link List} 객체
+     * @return 전체 스토어 목록을 포함한 {@link ApiResponse} 형태의 {@link List} 객체
      */
 
     @GetMapping("/all")
-    public ResponseEntity<ApiResult<List<StoreResponse>>> getAllStores() {
+    public ResponseEntity<ApiResponse<List<StoreResponse>>> getAllStores() {
         List<StoreResponse> stores = storeService.getAllStores();
-
-        return ResponseEntity.ok(
-                ApiResult.<List<StoreResponse>>builder()
-                        .status(StatusEnum.SUCCESS)
-                        .message("모든 스토어 반환")
-                        .data(stores)
-                        .build()
-        );
+        return ApiResponseUtil.ok("모든 스토어 반환", stores);
     }
-
 
 
 }

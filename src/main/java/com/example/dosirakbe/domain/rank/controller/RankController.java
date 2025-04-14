@@ -4,13 +4,15 @@ import com.example.dosirakbe.domain.auth.dto.response.CustomOAuth2User;
 import com.example.dosirakbe.domain.rank.dto.response.RankResponse;
 import com.example.dosirakbe.domain.rank.service.RankService;
 import com.example.dosirakbe.global.util.ApiResult;
-import com.example.dosirakbe.global.util.StatusEnum;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.github.hyeonjaez.springcommon.response.ApiResponse;
+import com.github.hyeonjaez.springcommon.response.ApiResponseUtil;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 import java.util.List;
 
 
@@ -28,11 +30,11 @@ import java.util.List;
 
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/users")
 public class RankController {
 
-    @Autowired
-    private RankService rankService;
+    private final RankService rankService;
 
     /**
      * 전체 사용자 랭킹을 반환합니다.
@@ -45,15 +47,10 @@ public class RankController {
      */
 
     @GetMapping("/rank")
-    public ResponseEntity<ApiResult<List<RankResponse>>> getAllRanks() {
+    public ResponseEntity<ApiResponse<List<RankResponse>>> getAllRanks() {
         List<RankResponse> ranks = rankService.getRankedUsers();
-        return ResponseEntity.ok(
-                ApiResult.<List<RankResponse>>builder()
-                        .status(StatusEnum.SUCCESS)
-                        .message("전체 랭킹 반환")
-                        .data(ranks)
-                        .build()
-        );
+
+        return ApiResponseUtil.ok("전체 랭킹 반환", ranks);
     }
 
     /**
@@ -68,16 +65,9 @@ public class RankController {
      */
 
     @GetMapping("/me/rank")
-    public ResponseEntity<ApiResult<RankResponse>> getRankByUserId(@AuthenticationPrincipal CustomOAuth2User customOAuth2User) {
+    public ResponseEntity<ApiResponse<RankResponse>> getRankByUserId(@AuthenticationPrincipal CustomOAuth2User customOAuth2User) {
         Long userId = customOAuth2User.getUserDTO().getUserId();
         RankResponse rank = rankService.getRankByUserId(userId);
-
-        return ResponseEntity.ok(
-                ApiResult.<RankResponse>builder()
-                        .status(StatusEnum.SUCCESS)
-                        .message("사용자의 랭킹 반환")
-                        .data(rank)
-                        .build()
-        );
+        return ApiResponseUtil.ok("사용자의 랭킹 반환", rank);
     }
 }

@@ -1,10 +1,10 @@
 package com.example.dosirakbe.domain.elite.service;
 
 import com.example.dosirakbe.domain.elite.dto.EliteInfoDto;
+import com.example.dosirakbe.domain.elite.entity.EliteInfo;
 import com.example.dosirakbe.domain.elite.repository.EliteInfoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import java.util.Optional;
 
 /**
  * packageName    : com.example.dosirakbe.domain.elite.service<br>
@@ -30,14 +30,15 @@ public class EliteInfoService {
      * @param userId 사용자 ID
      * @return 사용자의 엘리트 통계 정보를 감싸는 Optional<EliteInfoDto> 객체
      */
-    public Optional<EliteInfoDto> findEliteInfoByUserId(Long userId) {
-        return eliteInfoRepository.findByUserId(userId)
-                .map(eliteInfo -> EliteInfoDto.builder()
-                        .id(eliteInfo.getInfoId())
-                        .userId(eliteInfo.getUserId())
-                        .correctAnswers(eliteInfo.getCorrectAnswers())
-                        .incorrectAnswers(eliteInfo.getIncorrectAnswers())
-                        .totalAnswers(eliteInfo.getTotalAnswers())
-                        .build());
+    public EliteInfoDto findEliteInfoByUserId(Long userId) {
+        EliteInfo eliteInfo = eliteInfoRepository.findByUserId(userId).orElseThrow(); //TODO
+
+        return EliteInfoDto.builder()
+                .id(eliteInfo.getInfoId())
+                .userId(eliteInfo.getUserId())
+                .correctAnswers(eliteInfo.getCorrectAnswers())
+                .incorrectAnswers(eliteInfo.getIncorrectAnswers())
+                .totalAnswers(eliteInfo.getTotalAnswers())
+                .build();
     }
 }
