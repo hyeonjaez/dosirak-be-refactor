@@ -8,7 +8,7 @@
 //import com.example.dosirakbe.domain.user.entity.User;
 //import com.example.dosirakbe.domain.user.repository.UserRepository;
 //import com.example.dosirakbe.global.util.ApiException;
-//import com.example.dosirakbe.global.util.ExceptionEnum;
+//import com.example.dosirakbe.global.exception.ExceptionEnum;
 //import org.junit.jupiter.api.DisplayName;
 //import org.junit.jupiter.api.Test;
 //import org.junit.jupiter.api.extension.ExtendWith;

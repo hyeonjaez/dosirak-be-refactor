@@ -21,7 +21,6 @@ public class SeoulBikeInfoController {
     @GetMapping
     public ResponseEntity<ApiResponse<List<SeoulBikeInfoResponse>>> getSeoulBikeListByAroundMe(@RequestParam(required = true) @NotNull BigDecimal myLatitude,
                                                                                                @RequestParam(required = true) @NotNull BigDecimal myLongitude) {
-
         List<SeoulBikeInfoResponse> seoulBikeListAroundMe = seoulBikeInfoService.getSeoulBikeListAroundMe(myLatitude, myLongitude);
         return ApiResponseUtil.ok("seoul bike list by around me retrieved successfully", seoulBikeListAroundMe);
 

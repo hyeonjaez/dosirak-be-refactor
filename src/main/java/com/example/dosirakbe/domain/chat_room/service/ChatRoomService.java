@@ -21,8 +21,8 @@ import com.example.dosirakbe.domain.user_chat_room.repository.UserChatRoomReposi
 import com.example.dosirakbe.domain.zone_category.entity.ZoneCategory;
 import com.example.dosirakbe.domain.zone_category.repository.ZoneCategoryRepository;
 import com.example.dosirakbe.global.config.S3Uploader;
-import com.example.dosirakbe.global.util.ApiException;
-import com.example.dosirakbe.global.util.ExceptionEnum;
+import com.example.dosirakbe.global.exception.ExceptionEnum;
+import com.github.hyeonjaez.springcommon.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Sort;
@@ -73,17 +73,17 @@ public class ChatRoomService {
      * @param createRequest 채팅방 생성 요청 데이터
      * @param userId        채팅방을 생성하는 사용자의 ID
      * @return 생성된 채팅방의 상세 정보를 {@link ChatRoomResponse} 형태로 반환합니다.
-     * @throws ApiException 데이터 검증 실패 또는 관련 데이터가 존재하지 않을 경우 발생합니다.
+     * @throws BusinessException 데이터 검증 실패 또는 관련 데이터가 존재하지 않을 경우 발생합니다.
      */
     public ChatRoomResponse createChatRoom(MultipartFile file, ChatRoomRegisterRequest createRequest, Long userId) {
         validationFile(file, createRequest);
 
         User user = userRepository.findById(userId)
                 .orElseThrow(
-                        () -> new ApiException(ExceptionEnum.DATA_NOT_FOUND));
+                        () -> new BusinessException(ExceptionEnum.USER_NOT_FOUND));
         ZoneCategory zoneCategory = zoneCategoryRepository.findByName(createRequest.getZoneCategoryName())
                 .orElseThrow(
-                        () -> new ApiException(ExceptionEnum.DATA_NOT_FOUND));
+                        () -> new BusinessException(ExceptionEnum.ZONE_CATEGORY_NOT_FOUND));
         String imageUrl = createRequest.getDefaultImage();
 
         if (Objects.nonNull(file)) {
@@ -109,11 +109,11 @@ public class ChatRoomService {
      *
      * @param user     채팅방에 참여할 사용자
      * @param chatRoom 참여할 채팅방
-     * @throws ApiException 사용자가 이미 채팅방에 참여하고 있을 경우 발생합니다.
+     * @throws BusinessException 사용자가 이미 채팅방에 참여하고 있을 경우 발생합니다.
      */
     public void joinChatRoom(User user, ChatRoom chatRoom) {
         if (userChatRoomRepository.existsByUserAndChatRoom(user, chatRoom)) {
-            throw new ApiException(ExceptionEnum.CONFLICT);
+            throw new BusinessException(ExceptionEnum.CHAT_ROOM_DUPLICATE);
         }
 
         userChatRoomRepository.save(new UserChatRoom(chatRoom, user));
@@ -143,18 +143,18 @@ public class ChatRoomService {
      *
      * <p>
      * 이 메서드는 주어진 ID에 해당하는 채팅방을 데이터베이스에서 조회하며,
-     * 존재하지 않을 경우 {@link ApiException}을 발생시킵니다.
+     * 존재하지 않을 경우 {@link BusinessException}을 발생시킵니다.
      * </p>
      *
      * @param chatRoomId 조회할 채팅방의 ID
      * @return 조회된 {@link ChatRoom} 엔티티
-     * @throws ApiException 채팅방이 존재하지 않을 경우 발생합니다.
+     * @throws BusinessException 채팅방이 존재하지 않을 경우 발생합니다.
      */
     @Transactional(readOnly = true)
     public ChatRoom findChatRoomById(Long chatRoomId) {
         return chatRoomRepository.findById(chatRoomId)
                 .orElseThrow(
-                        () -> new ApiException(ExceptionEnum.DATA_NOT_FOUND));
+                        () -> new BusinessException(ExceptionEnum.CHAT_ROOM_NOT_FOUND));
     }
 
     /**
@@ -167,13 +167,13 @@ public class ChatRoomService {
      *
      * @param userId 조회할 사용자의 ID
      * @return 사용자가 참여하고 있는 모든 채팅방의 상세 정보를 포함한 리스트
-     * @throws ApiException 사용자가 존재하지 않을 경우 발생합니다.
+     * @throws BusinessException 사용자가 존재하지 않을 경우 발생합니다.
      */
     @Transactional(readOnly = true)
     public List<UserChatRoomParticipationResponse> findAllByUser(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(
-                        () -> new ApiException(ExceptionEnum.DATA_NOT_FOUND));
+                        () -> new BusinessException(ExceptionEnum.USER_NOT_FOUND));
         List<UserChatRoom> allByUserId = userChatRoomRepository.findAllByUser(user);
 
         return allByUserId.stream()
@@ -199,12 +199,12 @@ public class ChatRoomService {
      *
      * @param userId 조회할 사용자의 ID
      * @return 사용자가 참여하고 있는 모든 채팅방의 간략한 정보를 포함한 리스트
-     * @throws ApiException 사용자가 존재하지 않을 경우 발생합니다.
+     * @throws BusinessException 사용자가 존재하지 않을 경우 발생합니다.
      */
     public List<UserChatRoomBriefParticipationResponse> findAllBriefByUser(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(
-                        () -> new ApiException(ExceptionEnum.DATA_NOT_FOUND));
+                        () -> new BusinessException(ExceptionEnum.USER_NOT_FOUND));
         List<UserChatRoom> allByUserId = userChatRoomRepository.findAllByUser(user);
 
         return allByUserId.stream()
@@ -231,19 +231,19 @@ public class ChatRoomService {
      *
      * @param userId     사용자의 ID
      * @param chatRoomId 떠날 채팅방의 ID
-     * @throws ApiException 사용자가 존재하지 않거나, 채팅방에 참여하고 있지 않을 경우 발생합니다.
+     * @throws BusinessException 사용자가 존재하지 않거나, 채팅방에 참여하고 있지 않을 경우 발생합니다.
      */
     public void leaveChatRoom(Long userId, Long chatRoomId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(
-                        () -> new ApiException(ExceptionEnum.DATA_NOT_FOUND));
+                        () -> new BusinessException(ExceptionEnum.USER_NOT_FOUND));
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
                 .orElseThrow(
-                        () -> new ApiException(ExceptionEnum.DATA_NOT_FOUND));
+                        () -> new BusinessException(ExceptionEnum.CHAT_ROOM_NOT_FOUND));
 
         UserChatRoom userChatRoom = userChatRoomRepository.findByUserAndChatRoom(user, chatRoom)
                 .orElseThrow(
-                        () -> new ApiException(ExceptionEnum.DATA_NOT_FOUND));
+                        () -> new BusinessException(ExceptionEnum.USER_CHAT_ROOM_NOT_FOUND));
 
         userChatRoomRepository.delete(userChatRoom);
         chatRoom.downPersonCount();
@@ -260,19 +260,19 @@ public class ChatRoomService {
      * @param userId     조회할 사용자의 ID
      * @param chatRoomId 조회할 채팅방의 ID
      * @return 채팅방의 상세 정보를 포함한 {@link ChatRoomInformationResponse}
-     * @throws ApiException 사용자가 존재하지 않거나, 채팅방에 참여하고 있지 않을 경우 발생합니다.
+     * @throws BusinessException 사용자가 존재하지 않거나, 채팅방에 참여하고 있지 않을 경우 발생합니다.
      */
     @Transactional(readOnly = true)
     public ChatRoomInformationResponse findMessagesByChatRoom(Long userId, Long chatRoomId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(
-                        () -> new ApiException(ExceptionEnum.DATA_NOT_FOUND));
+                        () -> new BusinessException(ExceptionEnum.USER_NOT_FOUND));
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
                 .orElseThrow(
-                        () -> new ApiException(ExceptionEnum.DATA_NOT_FOUND));
+                        () -> new BusinessException(ExceptionEnum.CHAT_ROOM_NOT_FOUND));
         UserChatRoom userChatRoom = userChatRoomRepository.findByUserAndChatRoom(user, chatRoom)
                 .orElseThrow(
-                        () -> new ApiException(ExceptionEnum.DATA_NOT_FOUND));
+                        () -> new BusinessException(ExceptionEnum.USER_CHAT_ROOM_NOT_FOUND));
 
         List<Message> chatRoomMessageByUser = messageRepository.findByChatRoomIdAndCreatedAtAfterOrderByCreatedAtAsc(chatRoom.getId(), userChatRoom.getCreatedAt());
         List<User> chatRoomUserList = userChatRoomRepository.findAllByChatRoom(chatRoom).stream().map(UserChatRoom::getUser).toList();
@@ -296,7 +296,7 @@ public class ChatRoomService {
      * @param sort             정렬 방식 ("popular" 또는 "recent")
      * @param search           검색어 (선택 사항)
      * @return 검색 및 정렬된 채팅방의 간략한 정보를 포함한 리스트
-     * @throws ApiException 지역 카테고리가 존재하지 않을 경우 발생합니다.
+     * @throws BusinessException 지역 카테고리가 존재하지 않을 경우 발생합니다.
      */
     @Transactional(readOnly = true)
     public List<ChatRoomBriefResponse> findAllChatRoomBySearchAndSort(Long userId, String zoneCategoryName, String sort, String search) {
@@ -305,10 +305,10 @@ public class ChatRoomService {
                 : Sort.by(Sort.Direction.DESC, "createdAt");
 
         ZoneCategory zoneCategory = zoneCategoryRepository.findByName(zoneCategoryName)
-                .orElseThrow(() -> new ApiException(ExceptionEnum.DATA_NOT_FOUND));
+                .orElseThrow(() -> new BusinessException(ExceptionEnum.ZONE_CATEGORY_NOT_FOUND));
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ApiException(ExceptionEnum.DATA_NOT_FOUND));
+                .orElseThrow(() -> new BusinessException(ExceptionEnum.USER_NOT_FOUND));
 
         String searchQuery = (Objects.nonNull(search)) ? search.trim() : null;
 
@@ -328,14 +328,14 @@ public class ChatRoomService {
      *
      * @param file          업로드된 파일 (선택 사항)
      * @param createRequest 채팅방 생성 요청 데이터
-     * @throws ApiException 유효하지 않은 요청일 경우 발생합니다.
+     * @throws BusinessException 유효하지 않은 요청일 경우 발생합니다.
      */
     private void validationFile(MultipartFile file, ChatRoomRegisterRequest createRequest) {
         if (Objects.isNull(createRequest.getDefaultImage()) && (Objects.isNull(file) || file.isEmpty())) {
-            throw new ApiException(ExceptionEnum.INVALID_REQUEST);
+            throw new BusinessException(ExceptionEnum.CHAT_ROOM_INVALID_REQUEST);
         }
         if (Objects.nonNull(createRequest.getDefaultImage()) && Objects.nonNull(file)) {
-            throw new ApiException(ExceptionEnum.INVALID_REQUEST);
+            throw new BusinessException(ExceptionEnum.CHAT_ROOM_INVALID_REQUEST);
         }
     }
 }

@@ -4,8 +4,8 @@ import com.amazonaws.SdkClientException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.AmazonS3Exception;
 import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.example.dosirakbe.global.util.CustomException;
-import com.example.dosirakbe.global.util.ExceptionEnum;
+import com.example.dosirakbe.global.exception.ExceptionEnum;
+import com.github.hyeonjaez.springcommon.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -49,7 +49,7 @@ public class S3Uploader {
      *
      * @param multipartFiles 업로드할 {@link MultipartFile} 목록
      * @return 업로드된 파일의 S3 URL 목록
-     * @throws CustomException 중복된 파일이 포함되어 있거나 업로드 중 오류가 발생한 경우
+     * @throws BusinessException 중복된 파일이 포함되어 있거나 업로드 중 오류가 발생한 경우
      */
     public List<String> saveFiles(List<MultipartFile> multipartFiles) {
         List<String> uploadedUrls = new ArrayList<>();
@@ -57,7 +57,7 @@ public class S3Uploader {
         for (MultipartFile multipartFile : multipartFiles) {
 
             if (isDuplicate(multipartFile)) {
-                throw new CustomException(ExceptionEnum.DUPLICATE_IMAGE);
+                throw new BusinessException(ExceptionEnum.DUPLICATE_IMAGE);
             }
 
             String uploadedUrl = saveFile(multipartFile);
@@ -73,36 +73,36 @@ public class S3Uploader {
      *
      * <p>
      * 파일 URL 에서 버킷 이름과 파일 키를 추출하여 삭제 작업을 수행합니다.
-     * 파일이 존재하지 않거나 삭제 실패 시 적절한 {@link CustomException}이 발생합니다.
+     * 파일이 존재하지 않거나 삭제 실패 시 적절한 {@link BusinessException}이 발생합니다.
      * </p>
      *
      * @param fileUrl 삭제할 파일의 S3 URL
-     * @throws CustomException 파일이 존재하지 않거나 삭제 중 오류가 발생한 경우
+     * @throws BusinessException 파일이 존재하지 않거나 삭제 중 오류가 발생한 경우
      */
     public void deleteFile(String fileUrl) {
         String[] urlParts = fileUrl.split("/");
         String fileBucket = urlParts[2].split("\\.")[0];
 
         if (!fileBucket.equals(bucket)) {
-            throw new CustomException(ExceptionEnum.NO_IMAGE_EXIST);
+            throw new BusinessException(ExceptionEnum.NO_IMAGE_EXIST);
 
         }
 
         String objectKey = String.join("/", Arrays.copyOfRange(urlParts, 3, urlParts.length));
 
         if (!amazonS3.doesObjectExist(bucket, objectKey)) {
-            throw new CustomException(ExceptionEnum.NO_IMAGE_EXIST);
+            throw new BusinessException(ExceptionEnum.NO_IMAGE_EXIST);
         }
 
         try {
             amazonS3.deleteObject(bucket, objectKey);
         } catch (AmazonS3Exception e) {
             log.error("File delete fail : " + e.getMessage());
-            throw new CustomException(ExceptionEnum.FAIL_DELETE);
+            throw new BusinessException(ExceptionEnum.FAIL_DELETE);
 
         } catch (SdkClientException e) {
             log.error("AWS SDK client error : " + e.getMessage());
-            throw new CustomException(ExceptionEnum.FAIL_DELETE);
+            throw new BusinessException(ExceptionEnum.FAIL_DELETE);
         }
 
         log.info("File delete complete: " + objectKey);
@@ -117,7 +117,7 @@ public class S3Uploader {
      *
      * @param file 업로드할 {@link MultipartFile}
      * @return 업로드된 파일의 S3 URL
-     * @throws CustomException 업로드 중 오류가 발생한 경우
+     * @throws BusinessException 업로드 중 오류가 발생한 경우
      */
     public String saveFile(MultipartFile file) {
         String randomFilename = generateRandomFilename(file);
@@ -132,13 +132,13 @@ public class S3Uploader {
             amazonS3.putObject(bucket, randomFilename, file.getInputStream(), metadata);
         } catch (AmazonS3Exception e) {
             log.error("Amazon S3 error while uploading file: " + e.getMessage());
-            throw new CustomException(ExceptionEnum.FAIL_UPLOAD);
+            throw new BusinessException(ExceptionEnum.FAIL_UPLOAD);
         } catch (SdkClientException e) {
             log.error("AWS SDK client error while uploading file: " + e.getMessage());
-            throw new CustomException(ExceptionEnum.FAIL_UPLOAD);
+            throw new BusinessException(ExceptionEnum.FAIL_UPLOAD);
         } catch (IOException e) {
             log.error("IO error while uploading file: " + e.getMessage());
-            throw new CustomException(ExceptionEnum.FAIL_UPLOAD);
+            throw new BusinessException(ExceptionEnum.FAIL_UPLOAD);
         }
 
         log.info("File upload completed: " + randomFilename);
@@ -187,7 +187,7 @@ public class S3Uploader {
      *
      * @param multipartFile 파일 이름을 생성할 {@link MultipartFile}
      * @return 생성된 랜덤 파일 이름
-     * @throws CustomException 허용되지 않은 확장자인 경우
+     * @throws BusinessException 허용되지 않은 확장자인 경우
      */
     private String generateRandomFilename(MultipartFile multipartFile) {
         String originalFilename = multipartFile.getOriginalFilename();
@@ -204,14 +204,14 @@ public class S3Uploader {
      *
      * @param originalFilename 검증할 파일 이름
      * @return 검증된 확장자
-     * @throws CustomException 허용되지 않은 확장자인 경우
+     * @throws BusinessException 허용되지 않은 확장자인 경우
      */
     private String validateFileExtension(String originalFilename) {
         String fileExtension = originalFilename.substring(originalFilename.lastIndexOf(".") + 1).toLowerCase();
         List<String> allowedExtensions = Arrays.asList("jpg", "png", "gif", "jpeg");
 
         if (!allowedExtensions.contains(fileExtension)) {
-            throw new CustomException(ExceptionEnum.NOT_IMAGE_EXTENSION);
+            throw new BusinessException(ExceptionEnum.NOT_IMAGE_EXTENSION);
         }
         return fileExtension;
     }

@@ -4,7 +4,6 @@ import com.example.dosirakbe.domain.auth.dto.response.CustomOAuth2User;
 import com.example.dosirakbe.domain.chat_room.dto.request.ChatRoomRegisterRequest;
 import com.example.dosirakbe.domain.chat_room.dto.response.*;
 import com.example.dosirakbe.domain.chat_room.service.ChatRoomService;
-import com.example.dosirakbe.global.util.ApiResult;
 import com.github.hyeonjaez.springcommon.response.ApiResponse;
 import com.github.hyeonjaez.springcommon.response.ApiResponseUtil;
 import com.github.hyeonjaez.springcommon.response.EmptyResponse;
@@ -45,7 +44,7 @@ public class ChatRoomController {
      * <p>
      * 이 메서드는 인증된 사용자의 ID를 기반으로 새로운 채팅방을 생성하며,
      * 선택적으로 파일을 업로드할 수 있습니다.
-     * {@link ApiResult} 형태로 생성된 채팅방 정보를 반환합니다.
+     * {@link ApiResponse} 형태로 생성된 채팅방 정보를 반환합니다.
      * </p>
      *
      * @param customOAuth2User 인증된 사용자 정보
@@ -61,7 +60,7 @@ public class ChatRoomController {
 
         Long userId = getUserIdByOAuth(customOAuth2User);
         ChatRoomResponse chatRoomResponse = chatRoomService.createChatRoom(file, createRequest, userId);
-        return ApiResponseUtil.ok("Chat room created successfully", chatRoomResponse);
+        return ApiResponseUtil.created("Chat room created successfully", chatRoomResponse);
     }
 
     /**
@@ -69,7 +68,7 @@ public class ChatRoomController {
      *
      * <p>
      * 이 메서드는 인증된 사용자의 ID를 기반으로 특정 채팅방의 상세 정보를 조회하며,
-     * {@link ApiResult} 형태로 반환합니다.
+     * {@link ApiResponse} 형태로 반환합니다.
      * </p>
      *
      * @param customOAuth2User 인증된 사용자 정보
@@ -91,12 +90,12 @@ public class ChatRoomController {
      *
      * <p>
      * 이 메서드는 인증된 사용자의 ID를 기반으로 지정된 채팅방에서 사용자를 제거하며,
-     * {@link ApiResult} 형태로 응답을 반환합니다.
+     * {@link ApiResponse} 형태로 응답을 반환합니다.
      * </p>
      *
      * @param customOAuth2User 인증된 사용자 정보
      * @param chatRoomId       삭제 또는 떠날 채팅방의 ID
-     * @return {@link ResponseEntity}에 {@link ApiResult} 형태로 응답 메시지를 반환합니다.
+     * @return {@link ResponseEntity}에 {@link ApiResponse} 형태로 응답 메시지를 반환합니다.
      * 성공 시 HTTP 상태 코드 204(NO CONTENT)를 반환합니다.
      */
     @DeleteMapping("/{chatRoomId}")
@@ -112,7 +111,7 @@ public class ChatRoomController {
      *
      * <p>
      * 이 메서드는 인증된 사용자의 ID를 기반으로 지정된 지역 카테고리에 속한 채팅방 목록을 조회하며,
-     * {@link ApiResult} 형태로 반환합니다.
+     * {@link ApiResponse} 형태로 반환합니다.
      * </p>
      *
      * @param customOAuth2User 인증된 OAuth2 사용자 정보
@@ -137,7 +136,7 @@ public class ChatRoomController {
      *
      * <p>
      * 이 메서드는 인증된 사용자의 ID를 기반으로 현재 사용자가 참여하고 있는 모든 채팅방 목록을 조회하며,
-     * {@link ApiResult} 형태로 반환합니다.
+     * {@link ApiResponse} 형태로 반환합니다.
      * </p>
      *
      * @param customOAuth2User 인증된 사용자 정보
@@ -157,7 +156,7 @@ public class ChatRoomController {
      *
      * <p>
      * 이 메서드는 인증된 사용자의 ID를 기반으로 현재 사용자가 메인으로 참여하고 있는 채팅방 목록을 조회하며,
-     * {@link ApiResult} 형태로 반환합니다.
+     * {@link ApiResponse} 형태로 반환합니다.
      * </p>
      *
      * @param customOAuth2User 인증된 OAuth2 사용자 정보

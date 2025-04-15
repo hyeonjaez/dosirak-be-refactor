@@ -3,7 +3,6 @@ package com.example.dosirakbe.domain.rank.controller;
 import com.example.dosirakbe.domain.auth.dto.response.CustomOAuth2User;
 import com.example.dosirakbe.domain.rank.dto.response.RankResponse;
 import com.example.dosirakbe.domain.rank.service.RankService;
-import com.example.dosirakbe.global.util.ApiResult;
 import com.github.hyeonjaez.springcommon.response.ApiResponse;
 import com.github.hyeonjaez.springcommon.response.ApiResponseUtil;
 import lombok.RequiredArgsConstructor;
@@ -43,7 +42,7 @@ public class RankController {
      * 이 메서드는 모든 사용자의 랭킹 정보를 조회하여 반환합니다.
      * </p>
      *
-     * @return 전체 사용자 랭킹을 포함하는 {@link ApiResult} 형태의 {@link List} 객체
+     * @return 전체 사용자 랭킹을 포함하는 {@link ApiResponse} 형태의 {@link List} 객체
      */
 
     @GetMapping("/rank")
@@ -61,7 +60,7 @@ public class RankController {
      * </p>
      *
      * @param customOAuth2User 인증된 사용자의 정보를 포함하는 {@link CustomOAuth2User} 객체
-     * @return 특정 사용자의 랭킹 정보를 포함하는 {@link ApiResult} 형태의 {@link RankResponse} 객체
+     * @return 특정 사용자의 랭킹 정보를 포함하는 {@link ApiResponse} 형태의 {@link RankResponse} 객체
      */
 
     @GetMapping("/me/rank")

@@ -11,8 +11,8 @@ import com.example.dosirakbe.domain.message.repository.MessageRepository;
 import com.example.dosirakbe.domain.user.entity.User;
 import com.example.dosirakbe.domain.user.repository.UserRepository;
 import com.example.dosirakbe.domain.user_chat_room.repository.UserChatRoomRepository;
-import com.example.dosirakbe.global.util.ApiException;
-import com.example.dosirakbe.global.util.ExceptionEnum;
+import com.example.dosirakbe.global.exception.ExceptionEnum;
+import com.github.hyeonjaez.springcommon.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,17 +51,17 @@ public class MessageService {
      * @param chatRoomId             메시지가 전송될 채팅 방의 고유 식별자
      * @param messageRegisterRequest 메시지 생성에 필요한 요청 정보 {@link MessageRegisterRequest}
      * @return 생성된 메시지를 포함하는 {@link MessageResponse} DTO 객체
-     * @throws ApiException {@link ExceptionEnum#DATA_NOT_FOUND} 또는 {@link ExceptionEnum#RUNTIME_EXCEPTION} 예외 발생 시
+     * @throws BusinessException {@link ExceptionEnum#USER_NOT_FOUND} 또는 {@link ExceptionEnum#CHAT_ROOM_NOT_FOUND} 또는 {@link ExceptionEnum#USER_CHAT_ROOM_NOT_EXISTS} 예외 발생 시
      */
     public MessageResponse createMessage(Long userId, Long chatRoomId, MessageRegisterRequest messageRegisterRequest) {
         User user = userRepository.findById(userId)
                 .orElseThrow(
-                        () -> new ApiException(ExceptionEnum.DATA_NOT_FOUND));
+                        () -> new BusinessException(ExceptionEnum.USER_NOT_FOUND));
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
-                .orElseThrow(() -> new ApiException(ExceptionEnum.DATA_NOT_FOUND));
+                .orElseThrow(() -> new BusinessException(ExceptionEnum.CHAT_ROOM_NOT_FOUND));
 
         if (!userChatRoomRepository.existsByUserAndChatRoom(user, chatRoom)) {
-            throw new ApiException(ExceptionEnum.RUNTIME_EXCEPTION);
+            throw new BusinessException(ExceptionEnum.USER_CHAT_ROOM_NOT_EXISTS);
         }
 
         Message message = new Message(messageRegisterRequest.getContent(), messageRegisterRequest.getMessageType(), user, chatRoom);

@@ -3,6 +3,8 @@ package com.example.dosirakbe.domain.elite.service;
 import com.example.dosirakbe.domain.elite.dto.EliteInfoDto;
 import com.example.dosirakbe.domain.elite.entity.EliteInfo;
 import com.example.dosirakbe.domain.elite.repository.EliteInfoRepository;
+import com.example.dosirakbe.global.exception.ExceptionEnum;
+import com.github.hyeonjaez.springcommon.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +33,8 @@ public class EliteInfoService {
      * @return 사용자의 엘리트 통계 정보를 감싸는 Optional<EliteInfoDto> 객체
      */
     public EliteInfoDto findEliteInfoByUserId(Long userId) {
-        EliteInfo eliteInfo = eliteInfoRepository.findByUserId(userId).orElseThrow(); //TODO
+        EliteInfo eliteInfo = eliteInfoRepository.findByUserId(userId)
+                .orElseThrow(() -> new BusinessException(ExceptionEnum.ELITE_INFO_NOT_FOUND)); //TODO
 
         return EliteInfoDto.builder()
                 .id(eliteInfo.getInfoId())

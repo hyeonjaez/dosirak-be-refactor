@@ -1,12 +1,12 @@
 package com.example.dosirakbe.domain.activity_log.controller;
 
+import com.example.dosirakbe.domain.activity_log.dto.response.ActivityLogResponse;
 import com.example.dosirakbe.domain.activity_log.service.ActivityLogService;
 import com.example.dosirakbe.domain.auth.dto.response.CustomOAuth2User;
-import com.example.dosirakbe.global.util.ApiResult;
+import com.github.hyeonjaez.springcommon.response.ApiResponse;
 import com.github.hyeonjaez.springcommon.response.ApiResponseUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -42,11 +42,11 @@ public class ActivityLogController {
      *
      * @param customOAuth2User 인증된 사용자 정보
      * @param date             조회할 날짜 (yyyy-MM-dd 형식)
-     * @return 지정된 날짜의 활동 로그를 포함한 {@link ApiResult} 객체
+     * @return 지정된 날짜의 활동 로그를 포함한 {@link ApiResponse} 객체
      */
     @GetMapping
-    public ResponseEntity<?> getTodayActivityLog(@AuthenticationPrincipal CustomOAuth2User customOAuth2User,
-                                                 @RequestParam(name = "date", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+    public ResponseEntity<ApiResponse<List<ActivityLogResponse>>> getTodayActivityLog(@AuthenticationPrincipal CustomOAuth2User customOAuth2User,
+                                                                                      @RequestParam(name = "date", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
         Long userId = getUserIdByOAuth(customOAuth2User);
         return ApiResponseUtil.ok("Activity history for today retrieved successfully", activityLogService.getThatDateActivityLog(userId, date));
     }
@@ -60,11 +60,11 @@ public class ActivityLogController {
      *
      * @param customOAuth2User 인증된 사용자 정보
      * @param month            조회할 월 (yyyy-MM 형식)
-     * @return 지정된 월의 첫째 날의 활동 로그를 포함한 {@link ApiResult} 객체
+     * @return 지정된 월의 첫째 날의 활동 로그를 포함한 {@link ApiResponse} 객체
      */
     @GetMapping("/first-day/{month}")
-    public ResponseEntity<?> getActivityLogForFirstDayOfMonth(@AuthenticationPrincipal CustomOAuth2User customOAuth2User,
-                                                              @PathVariable("month") @DateTimeFormat(pattern = "yyyy-MM") YearMonth month) {
+    public ResponseEntity<ApiResponse<List<ActivityLogResponse>>> getActivityLogForFirstDayOfMonth(@AuthenticationPrincipal CustomOAuth2User customOAuth2User,
+                                                                                                   @PathVariable("month") @DateTimeFormat(pattern = "yyyy-MM") YearMonth month) {
         Long userId = getUserIdByOAuth(customOAuth2User);
         return ApiResponseUtil.ok("Activity history for first date retrieved successfully", activityLogService.getActivityLogForFirstDayOfMonth(userId, month));
     }

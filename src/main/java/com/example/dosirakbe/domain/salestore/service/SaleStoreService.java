@@ -1,10 +1,9 @@
 package com.example.dosirakbe.domain.salestore.service;
 
-
 import com.example.dosirakbe.domain.salestore.entity.SaleStore;
 import com.example.dosirakbe.domain.salestore.repository.SaleStoreRepository;
-import com.example.dosirakbe.global.util.ApiException;
-import com.example.dosirakbe.global.util.ExceptionEnum;
+import com.example.dosirakbe.global.exception.ExceptionEnum;
+import com.github.hyeonjaez.springcommon.exception.BusinessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -34,9 +33,10 @@ public class SaleStoreService {
      * 사용자가 입력한 주소가 "동"으로 끝날 경우 이를 제거한 후 검색을 수행합니다.
      * 검색된 가게 목록은 할인율 순으로 정렬됩니다.
      * </p>
+     *
      * @param saleStoreAddress 검색할 주소 문자열
      * @return 해당 주소를 포함하며 할인율 순으로 정렬된 가게 목록
-     * @throws ApiException {@link ExceptionEnum#DATA_NOT_FOUND} 예외 발생 시
+     * @throws BusinessException {@link ExceptionEnum#SALE_STORE_NOT_FOUND} 예외 발생 시
      */
 
     public List<SaleStore> getSaleStoresByAddress(String saleStoreAddress) {
@@ -44,12 +44,9 @@ public class SaleStoreService {
         if (saleStoreAddress.endsWith("동")) {
             saleStoreAddress = saleStoreAddress.replace("동", "");
         }
-
-
         List<SaleStore> saleStores = saleStoreRepository.findBySaleStoreAddressContainingOrderBySaleDiscountDesc(saleStoreAddress);
-
         if (saleStores.isEmpty()) {
-            throw new ApiException(ExceptionEnum.DATA_NOT_FOUND);
+            throw new BusinessException(ExceptionEnum.SALE_STORE_NOT_FOUND);
         }
 
         return saleStores;

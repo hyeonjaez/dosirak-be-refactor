@@ -4,13 +4,11 @@ import com.example.dosirakbe.domain.auth.dto.response.CustomOAuth2User;
 import com.example.dosirakbe.domain.track.dto.request.TrackMoveRequest;
 import com.example.dosirakbe.domain.track.dto.response.TrackMoveResponse;
 import com.example.dosirakbe.domain.track.service.TrackService;
-import com.example.dosirakbe.global.util.ApiException;
-import com.example.dosirakbe.global.util.ApiResult;
-import com.example.dosirakbe.global.util.ExceptionEnum;
-import com.example.dosirakbe.global.util.StatusEnum;
+import com.example.dosirakbe.global.exception.ExceptionEnum;
+import com.github.hyeonjaez.springcommon.response.ApiResponse;
+import com.github.hyeonjaez.springcommon.response.ApiResponseUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -49,8 +47,8 @@ public class TrackController {
      * @throws ApiException {@link ExceptionEnum#INVALID_REQUEST} 예외 발생 시
      */
     @PostMapping
-    public ResponseEntity<ApiResult<TrackMoveResponse>> recordMovingDistance(@AuthenticationPrincipal CustomOAuth2User customOAuth2User,
-                                                                             @RequestBody @Valid TrackMoveRequest trackMoveRequest) {
+    public ResponseEntity<ApiResponse<TrackMoveResponse>> recordMovingDistance(@AuthenticationPrincipal CustomOAuth2User customOAuth2User,
+                                                                               @RequestBody @Valid TrackMoveRequest trackMoveRequest) {
         Long userId = getUserId(customOAuth2User);
 
         if (!checkGapDistance(trackMoveRequest)) {
@@ -58,15 +56,8 @@ public class TrackController {
         }
 
         TrackMoveResponse trackMoveResponse = trackService.recordTrackDistance(userId, trackMoveRequest);
-        ApiResult<TrackMoveResponse> result = ApiResult.<TrackMoveResponse>builder()
-                .status(StatusEnum.SUCCESS)
-                .message("track move distance successful")
-                .data(trackMoveResponse)
-                .build();
 
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(result);
+        return ApiResponseUtil.created("track move distance successful", trackMoveResponse);
     }
 
     /**

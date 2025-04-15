@@ -4,10 +4,10 @@ package com.example.dosirakbe.domain.message.controller;
 import com.example.dosirakbe.domain.message.dto.request.MessageRegisterRequest;
 import com.example.dosirakbe.domain.message.dto.response.MessageResponse;
 import com.example.dosirakbe.domain.message.service.MessageService;
-import com.example.dosirakbe.global.util.ApiException;
-import com.example.dosirakbe.global.util.ExceptionEnum;
+import com.example.dosirakbe.global.exception.ExceptionEnum;
 import com.example.dosirakbe.global.util.JwtUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.hyeonjaez.springcommon.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -47,7 +47,7 @@ public class ChatController {
      * @param messagePayLoad 수신한 메시지의 페이로드(JSON 형식)
      * @param headerAccessor 메시지 헤더에 접근할 수 있는 {@link SimpMessageHeaderAccessor} 객체
      * @return 처리된 메시지를 포함한 {@link MessageResponse} 객체
-     * @throws ApiException {@link ExceptionEnum#INVALID_REQUEST} 예외 발생 시
+     * @throws BusinessException {@link ExceptionEnum#MESSAGE_INVALID_REQUEST} 예외 발생 시
      */
     @MessageMapping("/chat-room/{chatRoomId}/sendMessage")
     @SendTo("/topic/chat-room/{chatRoomId}")
@@ -60,7 +60,7 @@ public class ChatController {
         try {
             messageRegisterRequest = objectMapper.readValue(messagePayLoad, MessageRegisterRequest.class);
         } catch (Exception e) {
-            throw new ApiException(ExceptionEnum.INVALID_REQUEST);
+            throw new BusinessException(ExceptionEnum.MESSAGE_INVALID_REQUEST);
         }
 
         Long userId = validationAuthorization(headerAccessor);
@@ -78,7 +78,7 @@ public class ChatController {
      *
      * @param headerAccessor 메시지 헤더에 접근할 수 있는 {@link SimpMessageHeaderAccessor} 객체
      * @return 인증된 사용자의 고유 ID
-     * @throws ApiException {@link ExceptionEnum#ACCESS_DENIED_EXCEPTION} 예외 발생 시
+     * @throws BusinessException {@link ExceptionEnum#INVALID_ACCESS_TOKEN} 예외 발생 시
      */
     private Long validationAuthorization(SimpMessageHeaderAccessor headerAccessor) {
         String authorizationHeader = headerAccessor.getFirstNativeHeader("Authorization");
@@ -87,9 +87,9 @@ public class ChatController {
             try {
                 return jwtUtil.getUserId(token);
             } catch (Exception e) {
-                throw new ApiException(ExceptionEnum.ACCESS_DENIED_EXCEPTION);
+                throw new BusinessException(ExceptionEnum.INVALID_ACCESS_TOKEN);
             }
         }
-        throw new ApiException(ExceptionEnum.ACCESS_DENIED_EXCEPTION);
+        throw new BusinessException(ExceptionEnum.INVALID_ACCESS_TOKEN);
     }
 }

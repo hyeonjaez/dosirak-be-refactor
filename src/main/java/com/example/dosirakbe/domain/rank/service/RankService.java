@@ -3,8 +3,8 @@ package com.example.dosirakbe.domain.rank.service;
 import com.example.dosirakbe.domain.rank.dto.response.RankResponse;
 import com.example.dosirakbe.domain.user.entity.User;
 import com.example.dosirakbe.domain.user.repository.UserRepository;
-import com.example.dosirakbe.global.util.ApiException;
-import com.example.dosirakbe.global.util.ExceptionEnum;
+import com.example.dosirakbe.global.exception.ExceptionEnum;
+import com.github.hyeonjaez.springcommon.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -108,7 +108,7 @@ public class RankService {
      *
      * @param userId 랭킹 정보를 조회할 사용자의 고유 식별자
      * @return 사용자의 랭킹 정보를 포함하는 {@link RankResponse}
-     * @throws ApiException 사용자 정보가 존재하지 않을 경우 예외 발생
+     * @throws BusinessException 사용자 정보가 존재하지 않을 경우 예외 발생
      */
 
     public RankResponse getRankByUserId(Long userId) {
@@ -124,7 +124,7 @@ public class RankService {
                     int rank = allRank + 1;
 
                     User user = userRepository.findById(userId)
-                            .orElseThrow(() -> new ApiException(ExceptionEnum.DATA_NOT_FOUND));
+                            .orElseThrow(() -> new BusinessException(ExceptionEnum.USER_NOT_FOUND));
 
                     return new RankResponse(
                             user.getUserId(),

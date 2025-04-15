@@ -2,8 +2,7 @@ package com.example.dosirakbe.domain.salestore.service;
 
 import com.example.dosirakbe.domain.salestore.entity.SaleStore;
 import com.example.dosirakbe.domain.salestore.repository.SaleStoreRepository;
-import com.example.dosirakbe.global.util.ApiException;
-import com.example.dosirakbe.global.util.ExceptionEnum;
+import com.example.dosirakbe.global.exception.ExceptionEnum;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

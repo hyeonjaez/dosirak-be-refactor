@@ -7,8 +7,7 @@ import com.example.dosirakbe.domain.user_activity.dto.response.UserActivityRespo
 import com.example.dosirakbe.domain.user_activity.entity.UserActivity;
 import com.example.dosirakbe.domain.user_activity.implement.UserActivityReader;
 import com.example.dosirakbe.domain.user_activity.implement.UserActivityWriter;
-import com.example.dosirakbe.global.util.ApiException;
-import com.example.dosirakbe.global.util.ExceptionEnum;
+import com.example.dosirakbe.global.exception.ExceptionEnum;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
