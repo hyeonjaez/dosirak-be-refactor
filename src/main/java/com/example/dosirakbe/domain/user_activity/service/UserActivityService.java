@@ -8,6 +8,7 @@ import com.example.dosirakbe.domain.user_activity.entity.UserActivity;
 import com.example.dosirakbe.domain.user_activity.implement.UserActivityReader;
 import com.example.dosirakbe.domain.user_activity.implement.UserActivityWriter;
 import com.example.dosirakbe.global.exception.ExceptionEnum;
+import com.github.hyeonjaez.springcommon.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,7 +48,7 @@ public class UserActivityService {
      * @param userId 사용자의 고유 식별자 {@link Long}
      * @param month  조회할 월을 나타내는 {@link YearMonth} 객체 (선택 사항)
      * @return 조회된 사용자 활동을 포함하는 {@link List} 형태의 {@link UserActivityResponse} 객체 리스트
-     * @throws ApiException {@link ExceptionEnum#DATA_NOT_FOUND} 예외 발생 시
+     * @throws BusinessException {@link ExceptionEnum#USER_NOT_FOUND} 예외 발생 시
      */
     public List<UserActivityResponse> getUserActivityList(Long userId, YearMonth month) {
         User user = userReader.findByUserIdButThrow(userId);
@@ -70,7 +71,7 @@ public class UserActivityService {
      * </p>
      *
      * @param userId 사용자의 고유 식별자 {@link Long}
-     * @throws ApiException {@link ExceptionEnum#DATA_NOT_FOUND} 예외 발생 시
+     * @throws BusinessException {@link ExceptionEnum#USER_NOT_FOUND} 예외 발생 시
      */
     @Transactional
     public void createOrIncrementUserActivity(Long userId) {

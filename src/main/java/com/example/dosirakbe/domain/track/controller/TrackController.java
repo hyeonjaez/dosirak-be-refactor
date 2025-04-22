@@ -5,6 +5,7 @@ import com.example.dosirakbe.domain.track.dto.request.TrackMoveRequest;
 import com.example.dosirakbe.domain.track.dto.response.TrackMoveResponse;
 import com.example.dosirakbe.domain.track.service.TrackService;
 import com.example.dosirakbe.global.exception.ExceptionEnum;
+import com.github.hyeonjaez.springcommon.exception.BusinessException;
 import com.github.hyeonjaez.springcommon.response.ApiResponse;
 import com.github.hyeonjaez.springcommon.response.ApiResponseUtil;
 import jakarta.validation.Valid;
@@ -43,8 +44,8 @@ public class TrackController {
      *
      * @param customOAuth2User 인증된 사용자의 정보를 포함하는 {@link CustomOAuth2User} 객체
      * @param trackMoveRequest 사용자의 이동 거리를 포함하는 {@link TrackMoveRequest} 객체
-     * @return 기록된 이동 거리를 포함하는 {@link ApiResult} 형태의 {@link TrackMoveResponse} 객체
-     * @throws ApiException {@link ExceptionEnum#INVALID_REQUEST} 예외 발생 시
+     * @return 기록된 이동 거리를 포함하는 {@link ApiResponse} 형태의 {@link TrackMoveResponse} 객체
+     * @throws BusinessException {@link ExceptionEnum#INVALID_REQUEST} 예외 발생 시
      */
     @PostMapping
     public ResponseEntity<ApiResponse<TrackMoveResponse>> recordMovingDistance(@AuthenticationPrincipal CustomOAuth2User customOAuth2User,
@@ -52,7 +53,7 @@ public class TrackController {
         Long userId = getUserId(customOAuth2User);
 
         if (!checkGapDistance(trackMoveRequest)) {
-            throw new ApiException(ExceptionEnum.INVALID_REQUEST);
+            throw new BusinessException(ExceptionEnum.TRACK_INVALID_REQUEST);
         }
 
         TrackMoveResponse trackMoveResponse = trackService.recordTrackDistance(userId, trackMoveRequest);

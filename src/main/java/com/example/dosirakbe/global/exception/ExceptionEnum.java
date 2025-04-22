@@ -87,25 +87,16 @@ public enum ExceptionEnum implements ErrorCode {
     USER_CHAT_ROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "USER_CHAT_ROOM-001", "해당 user chat room 를 찾을 수 없습니다."),
     USER_CHAT_ROOM_NOT_EXISTS(HttpStatus.BAD_REQUEST, "USER_CHAT_ROOM-002", "해당 유저는 해당하는 chat room 에 들어가 있지 않습니다."),
 
-    ELITE_INFO_NOT_FOUND(HttpStatus.NOT_FOUND, "ELITE_INFO-001","해당하는 userId 의 Elite info 가 없습니다."),
+    ELITE_INFO_NOT_FOUND(HttpStatus.NOT_FOUND, "ELITE_INFO-001", "해당하는 userId 의 Elite info 가 없습니다."),
 
-    MESSAGE_INVALID_REQUEST(HttpStatus.BAD_REQUEST,"MESSAGE-001","message 의 request 데이터의 유효성이 허용되지 않습니다."),
+    MESSAGE_INVALID_REQUEST(HttpStatus.BAD_REQUEST, "MESSAGE-001", "message 의 request 데이터의 유효성이 허용되지 않습니다."),
 
     SALE_STORE_NOT_FOUND(HttpStatus.NOT_FOUND, "SALE_STORE-001", "해당하는 sale store 가 없습니다."),
 
     STORE_INVALID_REQUEST(HttpStatus.BAD_REQUEST, "STORE-001", "STORE 의 request 데이터의 유효성 검사를 실패했습니다."),
-    STORE_NOT_FOUND(HttpStatus.NOT_FOUND, "STORE-002","해당하는 store 가 없습니다."),
+    STORE_NOT_FOUND(HttpStatus.NOT_FOUND, "STORE-002", "해당하는 store 가 없습니다."),
 
-
-
-
-
-
-
-
-
-
-
+    TRACK_INVALID_REQUEST(HttpStatus.BAD_REQUEST, "TRACK-001", "요청하신 거리가 유효하지 않은 값입니다."),
 
 
     ;

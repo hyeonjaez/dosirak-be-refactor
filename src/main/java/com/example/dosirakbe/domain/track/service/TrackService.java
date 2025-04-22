@@ -11,6 +11,7 @@ import com.example.dosirakbe.domain.track.repository.TrackRepository;
 import com.example.dosirakbe.domain.user.entity.User;
 import com.example.dosirakbe.domain.user.repository.UserRepository;
 import com.example.dosirakbe.global.exception.ExceptionEnum;
+import com.github.hyeonjaez.springcommon.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -48,17 +49,17 @@ public class TrackService {
      * @param userId           메시지를 기록하는 사용자의 고유 식별자 {@link Long}
      * @param trackMoveRequest 사용자의 이동 거리 기록을 포함하는 {@link TrackMoveRequest} 객체
      * @return 기록된 이동 거리를 포함하는 {@link TrackMoveResponse} DTO 객체
-     * @throws ApiException {@link com.example.dosirakbe.global.util.ApiException} 발생 시
+     * @throws BusinessException {@link BusinessException} 발생 시
      */
     public TrackMoveResponse recordTrackDistance(Long userId, TrackMoveRequest trackMoveRequest) {
         User user = userRepository.findById(userId)
                 .orElseThrow(
-                        () -> new ApiException(ExceptionEnum.DATA_NOT_FOUND)
+                        () -> new BusinessException(ExceptionEnum.USER_NOT_FOUND)
                 );
 
         SaleStore saleStore = saleStoreRepository.findBySaleStoreName(trackMoveRequest.getSaleStoreName())
                 .orElseThrow(
-                        () -> new ApiException(ExceptionEnum.DATA_NOT_FOUND)
+                        () -> new BusinessException(ExceptionEnum.SALE_STORE_NOT_FOUND)
                 );
 
         Track track = new Track(saleStore.getSaleStoreName(), saleStore.getSaleStoreAddress(), trackMoveRequest.getMoveDistance(), user);
